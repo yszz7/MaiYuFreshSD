@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MaiYu ERP | SD Sales Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/style.css" rel="stylesheet">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">M</div><div><strong>MaiYu ERP</strong><small>FRESH TEA & BAKERY</small></div></div>
+    <div class="nav-label">SALES & DISTRIBUTION</div>
+    <button class="nav-link active" data-page="dashboard">▦ <span>Overview</span></button>
+    <button class="nav-link" data-page="orders">▤ <span>Sales Orders</span></button>
+    <button class="nav-link" data-page="requisitions">↗ <span>Store Replenishment</span></button>
+    <button class="nav-link" data-page="deliveries">▣ <span>Outbound Delivery</span></button>
+    <div class="sidebar-bottom"><div class="avatar">YS</div><div><strong>Yu Sen</strong><small>SD Sales Director</small></div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><span class="eyebrow">MAIYU FRESH TEA / ERP</span><h1 id="pageTitle">Sales Overview</h1></div><div class="top-actions"><span class="live-dot"></span><span>System online</span><button class="btn btn-green" id="newButton">＋ New Sales Order</button></div></header>
+    <section id="dashboardPage" class="page">
+      <div class="welcome"><div><p class="eyebrow light">SALES & DISTRIBUTION · SD</p><h2>Good business starts with<br>great service.</h2><p>Manage store sales, corporate orders, replenishment requests and outbound deliveries.</p></div><div class="welcome-art"><span>茶</span><i></i><b></b></div></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-top"><span>Total sales orders</span><span class="stat-icon">▤</span></div><strong id="totalOrders">0</strong><small>All recorded orders</small></div>
+        <div class="stat-card"><div class="stat-top"><span>Pending orders</span><span class="stat-icon amber">◷</span></div><strong id="pendingOrders">0</strong><small>Awaiting processing</small></div>
+        <div class="stat-card"><div class="stat-top"><span>Replenishment requests</span><span class="stat-icon blue">↗</span></div><strong id="replenishments">0</strong><small>Submitted / processing</small></div>
+        <div class="stat-card"><div class="stat-top"><span>Open deliveries</span><span class="stat-icon purple">▣</span></div><strong id="deliveriesCount">0</strong><small>Preparing / in transit</small></div>
+      </div>
+      <div class="content-card"><div class="section-heading"><div><h3>Recent Sales Orders</h3><p>Latest retail and corporate orders</p></div><button class="btn btn-outline-green" data-go="orders">View all orders →</button></div><div class="table-responsive"><table class="table"><thead><tr><th>ORDER</th><th>STORE / CUSTOMER</th><th>TYPE</th><th>PRODUCT</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody id="recentOrders"></tbody></table></div></div>
+    </section>
+    <section id="ordersPage" class="page hidden"><div class="content-card"><div class="section-heading"><div><h3>Sales Orders</h3><p>POS retail orders and B2B group-buy orders</p></div><button class="btn btn-green" onclick="openOrderModal()">＋ Create order</button></div><div class="toolbar"><input id="orderSearch" class="form-control" placeholder="Search order, store or product…"><span id="orderCount" class="muted"></span></div><div class="table-responsive"><table class="table"><thead><tr><th>ORDER NO.</th><th>STORE</th><th>CUSTOMER</th><th>TYPE</th><th>PRODUCT</th><th>QTY</th><th>TOTAL</th><th>STATUS</th><th></th></tr></thead><tbody id="ordersTable"></tbody></table></div></div></section>
+    <section id="requisitionsPage" class="page hidden"><div class="content-card"><div class="section-heading"><div><h3>Store Replenishment</h3><p>Store requisition orders submitted to the central factory</p></div><button class="btn btn-green" onclick="openReqModal()">＋ New request</button></div><div class="table-responsive"><table class="table"><thead><tr><th>REQUEST NO.</th><th>STORE</th><th>PRODUCT</th><th>QUANTITY</th><th>NOTES</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="reqTable"></tbody></table></div></div></section>
+    <section id="deliveriesPage" class="page hidden"><div class="content-card"><div class="section-heading"><div><h3>Outbound Delivery</h3><p>Track order dispatch and store delivery status</p></div><button class="btn btn-green" onclick="openDeliveryModal()">＋ Create delivery</button></div><div class="table-responsive"><table class="table"><thead><tr><th>DELIVERY NO.</th><th>ORDER NO.</th><th>STORE</th><th>CARRIER</th><th>DELIVERY DATE</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="deliveryTable"></tbody></table></div></div></section>
+    <footer>MaiYu Fresh Tea ERP <span>·</span> SD Sales Management Module</footer>
+  </main>
+</div>
+
+<div class="modal fade" id="orderModal" tabindex="-1"><div class="modal-dialog modal-lg modal-dialog-centered"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title">Create Sales Order</h5><p>Enter order details below</p></div><button class="btn-close" data-bs-dismiss="modal"></button></div><form id="orderForm"><div class="modal-body"><div class="form-grid">
+  <label>Store name<input name="store_name" required class="form-control" placeholder="e.g. Campus Store"></label>
+  <label>Customer / company<input name="customer_name" class="form-control" placeholder="Walk-in or company"></label>
+  <label>Order type<select name="order_type" class="form-select"><option>Retail</option><option>B2B Group</option></select></label>
+  <label>Product<input name="product_name" required class="form-control" placeholder="Product name"></label>
+  <label>Quantity<input name="quantity" type="number" min="1" value="1" required class="form-control"></label>
+  <label>Unit price<input name="unit_price" type="number" min="0" step=".01" value="0" required class="form-control"></label>
+  <label class="full">Status<select name="order_status" class="form-select"><option>Pending</option><option>Processing</option><option>Completed</option><option>Cancelled</option></select></label>
+</div></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button class="btn btn-green">Save order</button></div></form></div></div></div>
+<div class="modal fade" id="reqModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title">Store Replenishment Request</h5><p>Submit a request to the central factory</p></div><button class="btn-close" data-bs-dismiss="modal"></button></div><form id="reqForm"><div class="modal-body"><label>Store name<input name="store_name" class="form-control" required></label><label>Product<input name="product_name" class="form-control mt-3" required></label><label>Quantity<input name="quantity" type="number" min="1" value="100" class="form-control mt-3" required></label><label>Notes<textarea name="notes" class="form-control mt-3" rows="2" placeholder="Required date or details"></textarea></label></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button class="btn btn-green">Submit request</button></div></form></div></div></div>
+<div class="modal fade" id="deliveryModal" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content"><div class="modal-header"><div><h5 class="modal-title">Create Delivery</h5><p>Record an outbound delivery</p></div><button class="btn-close" data-bs-dismiss="modal"></button></div><form id="deliveryForm"><div class="modal-body"><label>Order number<input name="order_no" class="form-control" required placeholder="SO-..."></label><label>Store name<input name="store_name" class="form-control mt-3" required></label><label>Carrier / delivery team<input name="carrier" class="form-control mt-3"></label></div><div class="modal-footer"><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button><button class="btn btn-green">Create delivery</button></div></form></div></div></div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script><script src="/app.js"></script>
+</body></html>

@@ -1,49 +1,52 @@
 const pages = {
-  dashboard: ["Sales Overview", "dashboardPage"],
-  orders: ["Sales Orders", "ordersPage"],
-  requisitions: ["Store Replenishment", "requisitionsPage"],
-  deliveries: ["Outbound Delivery", "deliveriesPage"]
+    dashboard: ["Sales Overview", "dashboardPage"],
+    orders: ["Sales Orders", "ordersPage"],
+    requisitions: ["Store Replenishment", "requisitionsPage"],
+    deliveries: ["Outbound Delivery", "deliveriesPage"]
 };
 const modal = id => bootstrap.Modal.getOrCreateInstance(document.getElementById(id));
 const money = n => new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(Number(n||0));
 const esc = s => String(s ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const statusClass = s => String(s||"").toLowerCase().replace(/\s+/g,"");
 async function api(url, options={}) {
-  const response = await fetch(url,{headers:{"Content-Type":"application/json"},...options});
-  if(!response.ok) throw new Error(await response.text() || "Request failed");
-  return response.json();
+    const response = await fetch(url,{headers:{"Content-Type":"application/json"},...options});
+    if(!response.ok) throw new Error(await response.text() || "Request failed");
+    return response.json();
 }
 function showPage(name){
-  Object.values(pages).forEach(([,id])=>document.getElementById(id).classList.add("hidden"));
-  document.getElementById(pages[name][1]).classList.remove("hidden");
-  document.getElementById("pageTitle").textContent=pages[name][0];
-  document.querySelectorAll(".nav-link").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
-  document.getElementById("newButton").style.display=name==="dashboard"||name==="orders"?"":"none";
-  document.getElementById("newButton").textContent=name==="requisitions"?"＋ New request":name==="deliveries"?"＋ New delivery":"＋ New Sales Order";
-  refreshCurrent(name);
+    Object.values(pages).forEach(([,id])=>document.getElementById(id).classList.add("hidden"));
+    document.getElementById(pages[name][1]).classList.remove("hidden");
+    document.getElementById("pageTitle").textContent=pages[name][0];
+    document.querySelectorAll(".nav-link").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+    document.getElementById("newButton").style.display=name==="dashboard"||name==="orders"?"":"none";
+    document.getElementById("newButton").textContent=name==="requisitions"?"＋ New request":name==="deliveries"?"＋ New delivery":"＋ New Sales Order";
+    refreshCurrent(name);
 }
+
+// 注意：这里删除了之前控制 sdMenuToggle 的 JS 监听，因为已经改在 HTML 里实现了。
+
 document.querySelectorAll(".nav-link").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.go)));
 document.getElementById("newButton").addEventListener("click",()=>{const active=document.querySelector(".nav-link.active")?.dataset.page;if(active==="requisitions")openReqModal();else if(active==="deliveries")openDeliveryModal();else openOrderModal();});
 function refreshCurrent(name){if(name==="dashboard")loadDashboard();if(name==="orders")loadOrders();if(name==="requisitions")loadRequisitions();if(name==="deliveries")loadDeliveries();}
 async function loadDashboard(){
- try{
-  const d=await api("/api/dashboard");
-  document.getElementById("totalOrders").textContent=d.totalOrders;
-  document.getElementById("pendingOrders").textContent=d.pendingOrders;
-  document.getElementById("replenishments").textContent=d.replenishments;
-  document.getElementById("deliveriesCount").textContent=d.deliveries;
-  const orders=await api("/api/sales-orders");
-  document.getElementById("recentOrders").innerHTML=orders.slice(0,5).map(o=>`<tr><td class="order-number">${esc(o.order_no)}</td><td>${esc(o.store_name)}<br><span class="muted">${esc(o.customer_name)}</span></td><td>${esc(o.order_type)}</td><td>${esc(o.product_name)}</td><td><strong>${money(o.total_amount)}</strong></td><td>${badge(o.order_status)}</td></tr>`).join("")||emptyRow(6,"No sales orders yet");
- }catch(e){notify(e.message);}
+    try{
+        const d=await api("/api/dashboard");
+        document.getElementById("totalOrders").textContent=d.totalOrders;
+        document.getElementById("pendingOrders").textContent=d.pendingOrders;
+        document.getElementById("replenishments").textContent=d.replenishments;
+        document.getElementById("deliveriesCount").textContent=d.deliveries;
+        const orders=await api("/api/sales-orders");
+        document.getElementById("recentOrders").innerHTML=orders.slice(0,5).map(o=>`<tr><td class="order-number">${esc(o.order_no)}</td><td>${esc(o.store_name)}<br><span class="muted">${esc(o.customer_name)}</span></td><td>${esc(o.order_type)}</td><td>${esc(o.product_name)}</td><td><strong>${money(o.total_amount)}</strong></td><td>${badge(o.order_status)}</td></tr>`).join("")||emptyRow(6,"No sales orders yet");
+    }catch(e){notify(e.message);}
 }
 function badge(s){return `<span class="status ${statusClass(s)}">${esc(s)}</span>`;}
 function emptyRow(n,msg){return `<tr><td colspan="${n}" class="text-center py-5 text-secondary">${msg}</td></tr>`;}
 async function loadOrders(){
- try{const list=await api("/api/sales-orders");const q=(document.getElementById("orderSearch").value||"").toLowerCase();const filtered=list.filter(o=>[o.order_no,o.store_name,o.customer_name,o.product_name,o.order_type].some(v=>String(v||"").toLowerCase().includes(q)));
- document.getElementById("orderCount").textContent=`${filtered.length} order(s)`;
- document.getElementById("ordersTable").innerHTML=filtered.map(o=>`<tr><td class="order-number">${esc(o.order_no)}</td><td>${esc(o.store_name)}</td><td>${esc(o.customer_name)}</td><td>${esc(o.order_type)}</td><td>${esc(o.product_name)}</td><td>${o.quantity}</td><td><strong>${money(o.total_amount)}</strong></td><td>${badge(o.order_status)}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteOrder(${o.id})">Delete</button></td></tr>`).join("")||emptyRow(9,"No matching orders");}
- catch(e){notify(e.message);}
+    try{const list=await api("/api/sales-orders");const q=(document.getElementById("orderSearch").value||"").toLowerCase();const filtered=list.filter(o=>[o.order_no,o.store_name,o.customer_name,o.product_name,o.order_type].some(v=>String(v||"").toLowerCase().includes(q)));
+        document.getElementById("orderCount").textContent=`${filtered.length} order(s)`;
+        document.getElementById("ordersTable").innerHTML=filtered.map(o=>`<tr><td class="order-number">${esc(o.order_no)}</td><td>${esc(o.store_name)}</td><td>${esc(o.customer_name)}</td><td>${esc(o.order_type)}</td><td>${esc(o.product_name)}</td><td>${o.quantity}</td><td><strong>${money(o.total_amount)}</strong></td><td>${badge(o.order_status)}</td><td><button class="btn btn-sm btn-outline-danger" onclick="deleteOrder(${o.id})">Delete</button></td></tr>`).join("")||emptyRow(9,"No matching orders");}
+    catch(e){notify(e.message);}
 }
 document.getElementById("orderSearch").addEventListener("input",loadOrders);
 function openOrderModal(){document.getElementById("orderForm").reset();modal("orderModal").show();}

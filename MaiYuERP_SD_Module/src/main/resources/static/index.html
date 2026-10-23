@@ -12,12 +12,27 @@
   <aside class="sidebar">
     <div class="brand"><div class="brand-mark">M</div><div><strong>MaiYu ERP</strong><small>FRESH TEA & BAKERY</small></div></div>
     <div class="nav-label">SALES & DISTRIBUTION</div>
-    <button class="nav-link active" data-page="dashboard">▦ <span>Overview</span></button>
-    <button class="nav-link" data-page="orders">▤ <span>Sales Orders</span></button>
-    <button class="nav-link" data-page="requisitions">↗ <span>Store Replenishment</span></button>
-    <button class="nav-link" data-page="deliveries">▣ <span>Outbound Delivery</span></button>
+
+    <!-- 核心修复：直接使用 onclick 控制子菜单显示隐藏 -->
+    <button class="nav-group-toggle" id="sdMenuToggle" type="button"
+            onclick="var sub = document.getElementById('sdSubmenu'); var chev = document.getElementById('sdChevron'); if (sub.style.display === 'none' || sub.style.display === '') { sub.style.display = 'block'; chev.style.transform = 'rotate(0deg)'; } else { sub.style.display = 'none'; chev.style.transform = 'rotate(-90deg)'; }"
+            style="border: none !important; outline: none !important; box-shadow: none !important;">
+      <span class="nav-group-icon">▦</span>
+      <span class="nav-group-title">SD Sales Management</span>
+      <span class="nav-chevron" id="sdChevron" style="transform: rotate(-90deg);">⌄</span>
+    </button>
+
+    <!-- 初始状态直接写死 display: none -->
+    <div class="nav-submenu" id="sdSubmenu" style="display: none;">
+      <button class="nav-link active" data-page="dashboard">▦ <span>Overview</span></button>
+      <button class="nav-link" data-page="orders">▤ <span>Sales Orders</span></button>
+      <button class="nav-link" data-page="requisitions">↗ <span>Store Replenishment</span></button>
+      <button class="nav-link" data-page="deliveries">▣ <span>Outbound Delivery</span></button>
+    </div>
+
     <div class="sidebar-bottom"><div class="avatar">YS</div><div><strong>Yu Sen</strong><small>SD Sales Director</small></div></div>
   </aside>
+
   <main class="main">
     <header class="topbar"><div><span class="eyebrow">MAIYU FRESH TEA / ERP</span><h1 id="pageTitle">Sales Overview</h1></div><div class="top-actions"><span class="live-dot"></span><span>System online</span><button class="btn btn-green" id="newButton">＋ New Sales Order</button></div></header>
     <section id="dashboardPage" class="page">
